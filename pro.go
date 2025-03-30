@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -32,7 +33,7 @@ func decodePlayReady(pro string) {
 	if pro != "-" {
 		i, err = os.Open(pro)
 		if err != nil {
-			log.Fatal(err.Error())
+			log.Fatal("ERR_1 ", err.Error())
 		}
 	}
 
@@ -40,17 +41,22 @@ func decodePlayReady(pro string) {
 
 	data, err := io.ReadAll(i)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal("ERR_2 ", err.Error())
+	}
+
+	bb, err := base64.StdEncoding.DecodeString(string(data))
+	if err == nil {
+		data = bb
 	}
 
 	if err = restruct.Unpack(data, binary.LittleEndian, &o); err != nil {
-		log.Fatal(err.Error())
+		log.Fatal("ERR_3 ", err.Error())
 	}
 
 	var dec = unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewDecoder()
 	prh, err := dec.Bytes(o.Records.Value)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal("ERR_4 ", err.Error())
 	}
 
 	if prettyPrint {
