@@ -1,4 +1,4 @@
-all: fmt build test
+all: fmt build test snapshot
 
 fmt:
   go mod tidy
