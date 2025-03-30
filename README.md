@@ -7,23 +7,27 @@ Inspired by https://walkergriggs.com/2024/10/16/pssh_primordial_soup_of_secure-i
 
 ### Widevine PSSH
 
-From a file:
+Reference: https://github.com/shaka-project/shaka-packager/blob/main/packager/media/base/widevine_pssh_data.proto
+
+Decode from a file:
 
     soup -pssh widevine_pssh.bin
 
-From stdin:
+Decode from STDIN:
 
     cat widevine_pssh.bin | soup -pssh -
 
 ### PlayReady Object
 
-From a file:
+Reference: https://learn.microsoft.com/en-us/playready/specifications/playready-header-specification
+
+Decode from a file:
 
     soup -pro pro.bin
 
-From stdin:
+Decode from STDIN:
 
     cat pro.bin | soup -pro -
 
-> [!NOTE]  
+> [!NOTE]
 > Currently only PlayReady Objects that contain a single PlayReady Object Record are supported. If multiple records are present, the parsing behaviour is undefined and will likely fail.
