@@ -25,7 +25,7 @@ type PlayReadyObjectRecord struct {
 	Value  []byte `struct:"[]byte,sizefrom=Length,lsb"`
 }
 
-func decodePlayReady(pro string) {
+func decodePlayReadyObject(pro string) {
 	var o PlayReadyObject
 
 	var i = os.Stdin
