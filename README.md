@@ -5,29 +5,16 @@ Inspired by https://walkergriggs.com/2024/10/16/pssh_primordial_soup_of_secure-i
 
 ## Usage
 
-### Widevine PSSH
+References:
 
-Reference: https://github.com/shaka-project/shaka-packager/blob/main/packager/media/base/widevine_pssh_data.proto
+- https://github.com/shaka-project/shaka-packager/blob/main/packager/media/base/widevine_pssh_data.proto
+- https://learn.microsoft.com/en-us/playready/specifications/playready-header-specification
 
-Decode from a file:
+Either pipe input via STDIN, or use `-input [file]` to specify a filename. Accepts mp4 and raw pssh/pro paylods (with or without base64 encoding).
 
-    soup -pssh widevine_pssh.bin
+Use `-verbose` for debug logging.
 
-Decode from STDIN:
-
-    cat widevine_pssh.bin | soup -pssh -
-
-### PlayReady Object
-
-Reference: https://learn.microsoft.com/en-us/playready/specifications/playready-header-specification
-
-Decode from a file:
-
-    soup -pro pro.bin
-
-Decode from STDIN:
-
-    cat pro.bin | soup -pro -
+Use `-pretty=false` to disable pretty-printing (one line per header object printed).
 
 > [!NOTE]
 > Currently only PlayReady Objects that contain a single PlayReady Object Record are supported. If multiple records are present, the parsing behaviour is undefined and will likely fail.
