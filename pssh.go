@@ -2,52 +2,29 @@ package main
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
-	"io"
-	"log"
+	"fmt"
 	"os"
 
 	"github.com/google/uuid"
 	widevine "github.com/iyear/gowidevine"
 )
 
-func decodePSSH(pssh string) {
-	var i = os.Stdin
-	var err error
-	if pssh != "-" {
-		i, err = os.Open(pssh)
-		if err != nil {
-			log.Fatal("ERR_1 ", err.Error())
-		}
-	}
-
-	defer i.Close()
-
-	data, err := io.ReadAll(i)
+func decodeWidevine(b []byte) error {
+	o, err := widevine.NewPSSH(b)
 	if err != nil {
-		log.Fatal("ERR_2 ", err.Error())
-	}
-
-	bb, err := base64.StdEncoding.DecodeString(string(data))
-	if err == nil {
-		data = bb
-	}
-
-	o, err := widevine.NewPSSH(data)
-	if err != nil {
-		log.Fatal("ERR_3 ", err.Error())
+		return fmt.Errorf("failed to parse widevine pssh: %w", err)
 	}
 
 	var buf bytes.Buffer
 	var j = json.NewEncoder(&buf)
 	if err = j.Encode(o.Data()); err != nil {
-		log.Fatal("ERR_4 ", err.Error())
+		return fmt.Errorf("failed to encode widevine proto to json: %w", err)
 	}
 
 	var parsed = make(map[string]any)
 	if err = json.NewDecoder(&buf).Decode(&parsed); err != nil {
-		log.Fatal("ERR_5 ", err.Error())
+		return fmt.Errorf("failed to decode json: %w", err)
 	}
 
 	var keyIDs = make([]string, 0)
@@ -57,11 +34,23 @@ func decodePSSH(pssh string) {
 			keyIDs = append(keyIDs, u.String())
 		}
 	}
+	parsed["key_ids"] = keyIDs
 
 	var contentID = string(o.Data().ContentId)
+	contentID = string(tryBase64([]byte(contentID)))
 
-	parsed["key_ids"] = keyIDs
-	parsed["content_id"] = contentID
+	var contentIDMap = make(map[string]any)
+	err = json.NewDecoder(bytes.NewBufferString(contentID)).Decode(&contentIDMap)
+	if err == nil {
+		parsed["content_id"] = contentIDMap
+	} else {
+		parsed["content_id"] = contentID
+	}
+
+	scheme, ok := parsed["protection_scheme"].(float64)
+	if ok {
+		parsed["protection_scheme"] = protectionSchemeName(scheme)
+	}
 
 	var enc = json.NewEncoder(os.Stdout)
 	enc.SetEscapeHTML(false)
@@ -70,7 +59,30 @@ func decodePSSH(pssh string) {
 		enc.SetIndent("", "  ")
 	}
 
+	fmt.Fprintln(os.Stderr, "Widevine Object:")
+	fmt.Fprintln(os.Stderr, "----------------")
+
 	if err = enc.Encode(parsed); err != nil {
-		log.Fatal("ERR_6 ", err.Error())
+		return fmt.Errorf("failed to write json to STDERR: %w", err)
 	}
+
+	return nil
+}
+
+// 'cenc' (AES-CTR) = 0x63656E63,
+// 'cbc1' (AES-CBC) = 0x63626331,
+// 'cens' (AES-CTR pattern encryption) = 0x63656E73,
+// 'cbcs' (AES-CBC pattern encryption) = 0x63626373.
+func protectionSchemeName(n float64) string {
+	switch n {
+	case 0x63656E63:
+		return "cenc"
+	case 0x63626331:
+		return "cbc1"
+	case 0x63656E73:
+		return "cens"
+	case 0x63626373:
+		return "cbcs"
+	}
+	return "unknown"
 }

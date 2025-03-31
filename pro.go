@@ -1,12 +1,10 @@
 package main
 
 import (
-	"encoding/base64"
 	"encoding/binary"
 	"fmt"
-	"io"
-	"log"
 	"os"
+	"strings"
 
 	"github.com/go-restruct/restruct"
 	"github.com/go-xmlfmt/xmlfmt"
@@ -25,44 +23,27 @@ type PlayReadyObjectRecord struct {
 	Value  []byte `struct:"[]byte,sizefrom=Length,lsb"`
 }
 
-func decodePlayReadyObject(pro string) {
+func decodePlayReadyObject(b []byte) error {
 	var o PlayReadyObject
 
-	var i = os.Stdin
-	var err error
-	if pro != "-" {
-		i, err = os.Open(pro)
-		if err != nil {
-			log.Fatal("ERR_1 ", err.Error())
-		}
-	}
-
-	defer i.Close()
-
-	data, err := io.ReadAll(i)
-	if err != nil {
-		log.Fatal("ERR_2 ", err.Error())
-	}
-
-	bb, err := base64.StdEncoding.DecodeString(string(data))
-	if err == nil {
-		data = bb
-	}
-
-	if err = restruct.Unpack(data, binary.LittleEndian, &o); err != nil {
-		log.Fatal("ERR_3 ", err.Error())
+	if err := restruct.Unpack(b, binary.LittleEndian, &o); err != nil {
+		return fmt.Errorf("failed to parse pro: %w", err)
 	}
 
 	var dec = unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewDecoder()
 	prh, err := dec.Bytes(o.Records.Value)
 	if err != nil {
-		log.Fatal("ERR_4 ", err.Error())
+		return fmt.Errorf("failed to decode UTF-16LE: %w", err)
 	}
 
+	fmt.Fprintln(os.Stderr, "PlayReady Object:")
+	fmt.Fprintln(os.Stderr, "-----------------")
+
 	if prettyPrint {
-		fmt.Println(xmlfmt.FormatXML(string(prh), "", "  "))
-		return
+		fmt.Println(strings.TrimSpace(xmlfmt.FormatXML(string(prh), "", "  ")))
+		return nil
 	}
 
 	fmt.Println(string(prh))
+	return nil
 }
