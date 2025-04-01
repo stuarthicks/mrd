@@ -1,4 +1,4 @@
-module github.com/stuarthicks/soup
+module github.com/stuarthicks/mrd
 
 go 1.24.1
 

@@ -47,12 +47,12 @@ changelog:
 
 brews:
   -
-    name: soup
-    homepage: "https://github.com/stuarthicks/soup"
+    name: mrd
+    homepage: "https://github.com/stuarthicks/mrd"
     description: "Decodes the primordial soup of video DRM headers"
     license: "MIT"
     test: |
-      system "#{bin}/soup -h"
+      system "#{bin}/mrd -h"
     repository:
       owner: stuarthicks
       name: homebrew-tap
@@ -63,8 +63,8 @@ brews:
 
 scoops:
   -
-    name: soup
-    homepage: "https://github.com/stuarthicks/soup"
+    name: mrd
+    homepage: "https://github.com/stuarthicks/mrd"
     description: "Decodes the primordial soup of video DRM headers"
     license: "MIT"
     directory: bucket
