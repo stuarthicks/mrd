@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"io"
-	"log"
 	"log/slog"
 	"os"
 )
@@ -24,7 +23,7 @@ func main() {
 	if verbose {
 		programLevel = slog.LevelDebug
 	}
-	h := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: programLevel})
+	h := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: programLevel})
 	slog.SetDefault(slog.New(h))
 
 	var i = os.Stdin
@@ -32,7 +31,8 @@ func main() {
 	if input != "-" {
 		i, err = os.Open(input)
 		if err != nil {
-			log.Fatal("ERR_1 ", err.Error())
+			slog.Debug("unable to open input file", "err", err)
+			os.Exit(1)
 		}
 	}
 
