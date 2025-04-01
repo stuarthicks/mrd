@@ -4,6 +4,16 @@ mrd ("drm" backwards), pronounced /mɛː(ɹ)d/
 
 Decoding the primordial soup of video DRM metadata. Inspired by https://walkergriggs.com/2024/10/16/pssh_primordial_soup_of_secure-ish_headers/
 
+## Install
+
+Using Homebrew:
+
+    brew install stuarthicks/brews/mrd
+
+Using Go:
+
+    go install github.com/stuarthicks/mrd@latest
+
 ## Usage
 
 References:
