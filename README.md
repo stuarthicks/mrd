@@ -1,4 +1,4 @@
-# MRD
+# MRD ![workflow](https://github.com/stuarthicks/mrd/actions/workflows/go.yml/badge.svg)
 
 mrd ("drm" backwards), pronounced /mɛː(ɹ)d/
 
