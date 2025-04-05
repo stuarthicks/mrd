@@ -17,6 +17,7 @@ func main() {
 	flag.StringVar(&input, "input", "-", "Input file, or '-' for STDIN")
 	flag.BoolVar(&prettyPrint, "pretty", true, "Pretty-print output")
 	flag.BoolVar(&verbose, "verbose", false, "Output debug messages to STDERR")
+	flag.BoolVar(&verbose, "debug", false, "Output debug messages to STDERR (alias for -verbose)")
 	flag.Parse()
 
 	var programLevel = slog.LevelInfo

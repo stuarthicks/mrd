@@ -11,12 +11,15 @@ import (
 	"golang.org/x/text/encoding/unicode"
 )
 
+// PlayReady Object (PRO)
+// https://learn.microsoft.com/en-us/playready/specifications/playready-header-specification
 type PlayReadyObject struct {
 	Length      int `struct:"int32"`
 	RecordCount int `struct:"int16,sizeof=Records"`
 	Records     []PlayReadyObjectRecord
 }
 
+// PlayReady Object Record
 type PlayReadyObjectRecord struct {
 	Type   int    `struct:"int16"`
 	Length int    `struct:"int16,sizeof=Value"`
