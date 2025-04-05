@@ -16,22 +16,22 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Go
+    - name: Install Go
       uses: actions/setup-go@v4
       with:
         go-version: '1.24'
 
-    - name: Build
-      run: go build -v ./...
-
-    - name: Test
-      run: go test -v ./...
-
-    - name: GoReleaser Action
+    - name: Install GoReleaser
       uses: goreleaser/goreleaser-action@v6.3.0
       with:
         install-only: true
 
+    - name: Install Just
+      uses: extractions/setup-just@v3
+
+    - name: Test
+      run: just test
+
     - name: Build Snapshot
-      run: goreleaser release --clean --snapshot
-          
+      run: just snapshot
+
