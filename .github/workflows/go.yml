@@ -31,5 +31,7 @@ jobs:
       uses: goreleaser/goreleaser-action@v6.3.0
       with:
         install-only: true
-        run: goreleaser release --clean --snapshot
+
+    - name: Build Snapshot
+      run: goreleaser release --clean --snapshot
           
