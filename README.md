@@ -26,6 +26,3 @@ Either pipe input via STDIN, or use `-input [file]` to specify a filename. Accep
 Use `-verbose` or `-debug` for debug logging.
 
 Use `-pretty=false` to disable pretty-printing (one line per header object printed).
-
-> [!NOTE]
-> Currently only PlayReady Objects that contain a single PlayReady Object Record are supported. If multiple records are present, the parsing behaviour is undefined and will likely fail.
