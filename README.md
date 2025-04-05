@@ -23,7 +23,7 @@ References:
 
 Either pipe input via STDIN, or use `-input [file]` to specify a filename. Accepts mp4 and raw pssh/pro paylods (with or without base64 encoding).
 
-Use `-verbose` for debug logging.
+Use `-verbose` or `-debug` for debug logging.
 
 Use `-pretty=false` to disable pretty-printing (one line per header object printed).
 
