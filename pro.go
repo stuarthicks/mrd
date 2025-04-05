@@ -12,9 +12,9 @@ import (
 )
 
 type PlayReadyObject struct {
-	Length      int                   `struct:"int32"`
-	RecordCount int                   `struct:"int16"`
-	Records     PlayReadyObjectRecord // FIXME: restruct doesn't seem to correctly parse slices
+	Length      int `struct:"int32"`
+	RecordCount int `struct:"int16,sizeof=Records"`
+	Records     []PlayReadyObjectRecord
 }
 
 type PlayReadyObjectRecord struct {
@@ -31,19 +31,23 @@ func decodePlayReadyObject(b []byte) error {
 	}
 
 	var dec = unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewDecoder()
-	prh, err := dec.Bytes(o.Records.Value)
-	if err != nil {
-		return fmt.Errorf("failed to decode UTF-16LE: %w", err)
+
+	for _, r := range o.Records {
+		prh, err := dec.Bytes(r.Value)
+		if err != nil {
+			return fmt.Errorf("failed to decode UTF-16LE: %w", err)
+		}
+
+		fmt.Fprintln(os.Stderr, "PlayReady Object:")
+		fmt.Fprintln(os.Stderr, "-----------------")
+
+		if prettyPrint {
+			fmt.Println(strings.TrimSpace(xmlfmt.FormatXML(string(prh), "", "  ")))
+			return nil
+		}
+
+		fmt.Println(string(prh))
 	}
 
-	fmt.Fprintln(os.Stderr, "PlayReady Object:")
-	fmt.Fprintln(os.Stderr, "-----------------")
-
-	if prettyPrint {
-		fmt.Println(strings.TrimSpace(xmlfmt.FormatXML(string(prh), "", "  ")))
-		return nil
-	}
-
-	fmt.Println(string(prh))
 	return nil
 }
