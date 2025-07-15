@@ -9,11 +9,11 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/iyear/gowidevine v0.1.2
 	golang.org/x/text v0.23.0
+	google.golang.org/protobuf v1.35.1
 )
 
 require (
 	github.com/chmike/cmac-go v1.1.0 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
-	google.golang.org/protobuf v1.35.1 // indirect
 )

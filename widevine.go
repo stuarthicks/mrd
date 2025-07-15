@@ -4,13 +4,64 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/google/uuid"
 	widevine "github.com/iyear/gowidevine"
+	wvpb "github.com/iyear/gowidevine/widevinepb"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 )
 
 func decodeWidevine(b []byte) error {
+	slog.Debug("trying to parse widevine protobuf")
+
+	indent := ""
+	if prettyPrint {
+		indent = "  "
+	}
+
+	signedMsg := &wvpb.SignedMessage{}
+	if err := proto.Unmarshal(tryBase64(b), signedMsg); err != nil {
+		slog.Debug("failed to unmarshal signed widevinelicense message", "err", err.Error())
+	} else {
+		out, err := protojson.MarshalOptions{
+			EmitUnpopulated: false,
+			UseEnumNumbers:  false,
+			Indent:          indent,
+		}.Marshal(signedMsg)
+		if err != nil {
+			slog.Debug("failed to marshal signed widevine license message as json", "err", err.Error())
+		} else {
+			fmt.Fprintln(os.Stderr, "Widevine License Response:")
+			fmt.Fprintln(os.Stderr, "----------------")
+			fmt.Fprintln(os.Stdout, string(out))
+			fmt.Println()
+
+			licenseMsg := &wvpb.License{}
+			if err = proto.Unmarshal(signedMsg.Msg, licenseMsg); err != nil {
+				return fmt.Errorf("failed to unmarshal license message: %w", err)
+			} else {
+				out, err := protojson.MarshalOptions{
+					EmitUnpopulated: false,
+					UseEnumNumbers:  false,
+					Indent:          indent,
+				}.Marshal(licenseMsg)
+				if err != nil {
+					slog.Debug("failed to marshal license message as json", "err", err.Error())
+				} else {
+					fmt.Fprintln(os.Stderr, "Widevine License Message:")
+					fmt.Fprintln(os.Stderr, "----------------")
+					fmt.Fprintln(os.Stdout, string(out))
+
+					return nil
+				}
+			}
+		}
+	}
+
+	slog.Debug("trying to parse widevine protobuf")
 	o, err := widevine.NewPSSH(b)
 	if err != nil {
 		return fmt.Errorf("failed to parse widevine pssh: %w", err)
